@@ -31,6 +31,8 @@ const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className="flex items-center space-x-1">
       <button
+        type="button"
+        aria-label="Trang trước"
         onClick={handlePrevious}
         disabled={currentPage === 1}
         className={`p-2 rounded-md ${
@@ -41,7 +43,7 @@ const Pagination: React.FC<PaginationProps> = ({
       >
         <ChevronLeft size={20} />
       </button>
-      
+
       {Array.from({ length: Math.min(5, totalPages) }).map((_, index) => {
         // Determine which pages to show
         let pageNum;
@@ -71,6 +73,8 @@ const Pagination: React.FC<PaginationProps> = ({
       })}
       
       <button
+        type="button" // ✅ ngăn hành vi submit ngầm
+        aria-label="Trang sau" // ✅ giúp screen reader hiểu
         onClick={handleNext}
         disabled={currentPage === totalPages}
         className={`p-2 rounded-md ${
@@ -81,6 +85,7 @@ const Pagination: React.FC<PaginationProps> = ({
       >
         <ChevronRight size={20} />
       </button>
+
     </div>
   );
 };

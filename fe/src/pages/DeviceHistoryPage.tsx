@@ -90,7 +90,13 @@ const DeviceHistoryPage: React.FC = () => {
     {
       header: 'Tên thiết bị',
       accessor: 'name' as keyof DeviceData,
+      render: (value: string) => ({
+        light: 'Đèn',
+        fan: 'Quạt',
+        aircon: 'Điều hòa'
+      }[value] || value)
     },
+
     {
       header: 'Trạng thái',
       accessor: 'status' as keyof DeviceData,
