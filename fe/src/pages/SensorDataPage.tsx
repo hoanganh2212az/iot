@@ -14,7 +14,6 @@ interface SensorData {
 const SensorDataPage: React.FC = () => {
   const [sensorData, setSensorData] = useState<SensorData[]>([]);
   const [totalCount, setTotalCount] = useState<number>(0);
-
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [sortBy, setSortBy] = useState<string>('timestamp');
@@ -214,8 +213,17 @@ const SensorDataPage: React.FC = () => {
               value={sortOrder}
               onChange={handleSortOrder}
             >
-              <option value="ASC">Tăng dần</option>
-              <option value="DESC">Giảm dần</option>
+              {sortBy === 'timestamp' ? (
+                <>
+                  <option value="DESC">Mới nhất</option>
+                  <option value="ASC">Cũ nhất</option>
+                </>
+              ) : (
+                <>
+                  <option value="ASC">Tăng dần</option>
+                  <option value="DESC">Giảm dần</option>
+                </>
+              )}
             </select>
           </div>
         </div>
