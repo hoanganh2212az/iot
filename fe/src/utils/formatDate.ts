@@ -1,9 +1,15 @@
-import dayjs from 'dayjs';
+export function formatTimestamp(timestamp?: string): string {
+  if (!timestamp) return 'Invalid timestamp';
 
-/**
- * Format timestamp to "HH:mm:ss DD/MM/YYYY"
- * @param dateString ISO format string
- */
-export function formatTimestamp(dateString: string): string {
-  return dayjs(dateString).format('HH:mm:ss DD/MM/YYYY');
+  const date = new Date(timestamp);
+  if (isNaN(date.getTime())) return 'Invalid timestamp';
+
+  const hours = date.getUTCHours().toString().padStart(2, '0');
+  const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+  const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+  const day = date.getUTCDate().toString().padStart(2, '0');
+  const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+  const year = date.getUTCFullYear();
+
+  return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
 }

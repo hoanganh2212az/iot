@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DataTable from '../components/tables/DataTable';
 import { Search, Delete } from 'lucide-react';
+import { formatTimestamp } from '../utils/formatDate'; 
 
 interface SensorData {
   id: number | string;
@@ -119,7 +120,11 @@ const SensorDataPage: React.FC = () => {
     { header: 'Nhiệt độ (°C)', accessor: 'temperature' as keyof SensorData },
     { header: 'Độ ẩm (%)', accessor: 'humidity' as keyof SensorData },
     { header: 'Ánh sáng (lux)', accessor: 'light' as keyof SensorData },
-    { header: 'Thời gian', accessor: 'timestamp' as keyof SensorData },
+    {
+      header: 'Thời gian',
+      accessor: 'timestamp' as keyof SensorData,
+      render: (value: string) => formatTimestamp(value),
+    },
   ];
 
   return (

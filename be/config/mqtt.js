@@ -25,13 +25,7 @@ class MQTTService {
         if (topic === "esp32/lights/log") {
           const deviceName = this.getDeviceName(data.led);
           const state = data.state === "on" ? "on" : "off";
-
-          let timestamp = data.timestamp;
-          if (!timestamp || isNaN(Date.parse(timestamp))) {
-            const now = new Date();
-            const pad = (n) => String(n).padStart(2, '0');
-            timestamp = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-          }
+          const timestamp = this.getSQLTimestamp(data.timestamp);
 
           const deviceKey = this.getDeviceKey(deviceName);
 
@@ -45,11 +39,7 @@ class MQTTService {
 
         if (topic === "esp32/sensors") {
           const { temp, hum, light, timestamp } = data;
-          const ts = timestamp || (() => {
-            const now = new Date();
-            const pad = (n) => String(n).padStart(2, '0');
-            return `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())} ${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
-          })();
+          const ts = this.getSQLTimestamp(timestamp);
 
           await database.execute(
             'INSERT INTO sensors (temp, hum, light, timestamp) VALUES (?, ?, ?, ?)',
@@ -62,6 +52,21 @@ class MQTTService {
         console.error("❌ Lỗi xử lý MQTT message:", err.message);
       }
     });
+  }
+
+  getSQLTimestamp(raw) {
+    if (raw && !isNaN(Date.parse(raw))) {
+      const d = new Date(raw);
+      return this.formatTimestamp(d);
+    }
+
+    const now = new Date();
+    return this.formatTimestamp(now);
+  }
+
+  formatTimestamp(date) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   }
 
   getDeviceName(ledNumber) {
@@ -110,7 +115,6 @@ class MQTTService {
   }
 }
 
-// Singleton instance
 const mqttInstance = new MQTTService();
 
 module.exports = {

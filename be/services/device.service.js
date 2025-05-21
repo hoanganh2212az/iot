@@ -3,6 +3,10 @@ const { ErrorConstants } = require('../constants/error.constant');
 const { deviceModel } = require('../models/device.model');
 const { database } = require('../config/database');
 
+const dayjs = require('dayjs');
+const customParseFormat = require('dayjs/plugin/customParseFormat');
+dayjs.extend(customParseFormat);
+
 const deviceService = {
   getOne: async (id) => {
     return deviceModel.getOne(id);
@@ -13,8 +17,15 @@ const deviceService = {
     const params = [];
 
     if (dateSearch) {
-      conditions.push("timestamp LIKE ?");
-      params.push(`%${dateSearch}%`);
+      const parsedDate = dayjs(dateSearch, 'HH:mm:ss DD/MM/YYYY');
+      if (parsedDate.isValid()) {
+        // Convert to ISO string with 'Z' (UTC)
+        const adjusted = parsedDate.format('YYYY-MM-DD HH:mm:ss'); // UTC format to match DB
+        conditions.push("timestamp = ?");
+        params.push(adjusted);
+      } else {
+        console.warn("⚠️ Invalid date format received:", dateSearch);
+      }
     }
 
     let query = 'SELECT * FROM devices';
@@ -51,17 +62,15 @@ const deviceService = {
 
   toggle: async (devices) => {
     try {
-      // Publish and log each device separately
       for (const device of devices) {
         const { device: name, state } = device;
         const stateStr = state ? 'on' : 'off';
 
-        // ✅ Publish to MQTT
         if (mqttHandler?.publishDeviceControl) {
           mqttHandler.publishDeviceControl(name, state);
         } else {
           throw new Error("❌ mqttHandler.publishDeviceControl is undefined");
-        };
+        }
       }
 
       return null;

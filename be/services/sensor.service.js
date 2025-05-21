@@ -1,4 +1,7 @@
 const { database } = require('../config/database');
+const dayjs = require('dayjs');
+const customParseFormat = require('dayjs/plugin/customParseFormat');
+dayjs.extend(customParseFormat);
 
 const sensorService = {
   getAll: async (pageSize, page, filters, sortBy, sortOrder) => {
@@ -20,8 +23,14 @@ const sensorService = {
       params.push(filters.light);
     }
     if (filters.time) {
-      conditions.push('timestamp LIKE ?');
-      params.push(`%${filters.time}%`);
+      const parsedDate = dayjs(filters.time, 'HH:mm:ss DD/MM/YYYY');
+      if (parsedDate.isValid()) {
+        const formatted = parsedDate.format('YYYY-MM-DD HH:mm:ss');
+        conditions.push('timestamp = ?');
+        params.push(formatted);
+      } else {
+        console.warn('⚠️ Invalid time format received in sensor search:', filters.time);
+      }
     }
 
     if (conditions.length > 0) {

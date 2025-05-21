@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DataTable from '../components/tables/DataTable';
+import { formatTimestamp } from '../utils/formatDate'; 
 
 interface DeviceData {
   id: number;
@@ -130,6 +131,7 @@ const DeviceHistoryPage: React.FC = () => {
     {
       header: 'Thời gian',
       accessor: 'timestamp' as keyof DeviceData,
+      render: (value: string) => formatTimestamp(value),
     },
   ];
 
