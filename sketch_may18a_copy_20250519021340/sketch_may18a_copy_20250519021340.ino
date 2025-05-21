@@ -5,8 +5,8 @@
 
 // ------------ Configuration ------------
 
-const char* ssid = "Hehe";
-const char* password = "123456789";
+const char* ssid = "Tom Toc Xu";
+const char* password = "20022007";
 const char* mqtt_server = "broker.hivemq.com";
 const int mqtt_port = 1883;
 

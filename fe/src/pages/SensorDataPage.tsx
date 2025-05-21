@@ -16,6 +16,8 @@ const SensorDataPage: React.FC = () => {
 
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [sortBy, setSortBy] = useState<string>('timestamp');
+  const [sortOrder, setSortOrder] = useState<string>('DESC');
 
   const [searchTemperature, setSearchTemperature] = useState<string>('');
   const [searchHumidity, setSearchHumidity] = useState<string>('');
@@ -26,6 +28,8 @@ const SensorDataPage: React.FC = () => {
     const params = new URLSearchParams({
       page: page.toString(),
       pageSize: pageSize.toString(),
+      sortBy,
+      sortOrder,
     });
 
     if (searchTemperature.trim()) params.append("temp", searchTemperature);
@@ -55,10 +59,10 @@ const SensorDataPage: React.FC = () => {
 
   useEffect(() => {
     fetchSensorData();
-  }, [page, pageSize]);
+  }, [page, pageSize, sortBy, sortOrder]);
 
   const handleSearch = () => {
-    setPage(1); // Reset to first page
+    setPage(1);
     fetchSensorData();
   };
 
@@ -88,19 +92,27 @@ const SensorDataPage: React.FC = () => {
   };
 
   const handleDeleteRow = (id: string) => {
-  fetch(`http://localhost:3000/sensor/${id}`, {
-    method: 'DELETE',
-  })
-    .then((res) => {
-      if (res.ok) {
-        console.log(`🗑 Row ${id} deleted`);
-        fetchSensorData(); // Refresh list
-      } else {
-        throw new Error("Failed to delete row");
-      }
+    fetch(`http://localhost:3000/sensor/${id}`, {
+      method: 'DELETE',
     })
-    .catch((err) => console.error("❌ Delete row error:", err));
-};
+      .then((res) => {
+        if (res.ok) {
+          console.log(`🗑 Row ${id} deleted`);
+          fetchSensorData();
+        } else {
+          throw new Error("Failed to delete row");
+        }
+      })
+      .catch((err) => console.error("❌ Delete row error:", err));
+  };
+
+  const handleSort = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(e.target.value);
+  };
+
+  const handleSortOrder = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortOrder(e.target.value);
+  };
 
   const columns = [
     { header: 'ID', accessor: 'id' as keyof SensorData },
@@ -170,6 +182,36 @@ const SensorDataPage: React.FC = () => {
               value={searchTimestamp}
               onChange={e => setSearchTimestamp(e.target.value)}
             />
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4 mb-4">
+          <div className="flex items-center space-x-2">
+            <label htmlFor="sortBy" className="text-gray-700">Sắp xếp theo:</label>
+            <select
+              id="sortBy"
+              className="border border-gray-300 rounded-md px-3 py-2"
+              value={sortBy}
+              onChange={handleSort}
+            >
+              <option value="timestamp">Thời gian</option>
+              <option value="temp">Nhiệt độ</option>
+              <option value="hum">Độ ẩm</option>
+              <option value="light">Ánh sáng</option>
+            </select>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <label htmlFor="sortOrder" className="text-gray-700">Thứ tự:</label>
+            <select
+              id="sortOrder"
+              className="border border-gray-300 rounded-md px-3 py-2"
+              value={sortOrder}
+              onChange={handleSortOrder}
+            >
+              <option value="ASC">Tăng dần</option>
+              <option value="DESC">Giảm dần</option>
+            </select>
           </div>
         </div>
 

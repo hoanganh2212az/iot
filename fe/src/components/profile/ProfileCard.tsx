@@ -23,10 +23,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ profile }) => {
               <span className="mr-2">👤</span> Họ tên: {profile.name}
             </h2>
             <p className="text-gray-700 mb-2 flex items-center">
-              <span className="mr-2">🆔</span> MSV: {profile.studentId}
+              <span className="mr-2"></span> MSV: {profile.studentId}
             </p>
             <p className="text-gray-700 mb-2 flex items-center">
-              <span className="mr-2">👨‍🎓</span> Lớp: {profile.className}
+              <span className="mr-2"></span> Lớp: {profile.className}
             </p>
           </div>
           

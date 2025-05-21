@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import mqttService from '../services/mqttService'; // ✅ Singleton import
+import mqttService from '../services/mqttService';
+import { DeviceType } from '../types';
 
 export interface SensorData {
   id: number;
@@ -49,7 +50,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     aircon: false,
   });
 
-  // ✅ Load real device status from backend on first load
   useEffect(() => {
     fetch('http://localhost:3000/device/status')
       .then((res) => res.json())
@@ -77,7 +77,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => mqttService.disconnect();
   }, []);
-
 
   const toggleDevice = async (device: string) => {
     if (device in devices) {
