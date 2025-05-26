@@ -28,16 +28,16 @@ interface SensorChartProps {
 }
 
 const SensorChart: React.FC<SensorChartProps> = ({ data, limit = 10 }) => {
-  // Sort by timestamp and limit the number of points
+  // Sort by timestamp in descending order and limit the number of points
   const limitedData = [...data]
     .sort((a, b) => {
-      const timeA = a.timestamp.split(' ')[0]; // Extract time part (HH:mm:ss)
-      const timeB = b.timestamp.split(' ')[0];
+      const [timeA] = a.timestamp.split(' ');
+      const [timeB] = b.timestamp.split(' ');
       return timeA.localeCompare(timeB);
     })
     .slice(-limit);
   
-  const labels = limitedData.map(d => d.timestamp.split(' ')[0]); // Extract time part for labels
+  const labels = limitedData.map(d => d.timestamp.split(' ')[0]); // Get HH:mm:ss part
 
   const temperatureData = {
     labels,
@@ -86,11 +86,21 @@ const SensorChart: React.FC<SensorChartProps> = ({ data, limit = 10 }) => {
         position: 'top' as const,
       },
     },
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 0,
+          autoSkip: true,
+          maxTicksLimit: 10
+        }
+      }
+    }
   };
 
   const temperatureOptions = {
     ...commonOptions,
     scales: {
+      ...commonOptions.scales,
       y: {
         beginAtZero: true,
         max: 100,
@@ -105,6 +115,7 @@ const SensorChart: React.FC<SensorChartProps> = ({ data, limit = 10 }) => {
   const humidityOptions = {
     ...commonOptions,
     scales: {
+      ...commonOptions.scales,
       y: {
         beginAtZero: true,
         max: 100,
@@ -119,6 +130,7 @@ const SensorChart: React.FC<SensorChartProps> = ({ data, limit = 10 }) => {
   const lightOptions = {
     ...commonOptions,
     scales: {
+      ...commonOptions.scales,
       y: {
         beginAtZero: true,
         max: 1000,

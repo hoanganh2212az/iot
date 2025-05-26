@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import mqttService from '../services/mqttService';
 import { DeviceType } from '../types';
+import { formatTimestamp } from '../utils/formatDate';
 
 export interface SensorData {
   id: number;
@@ -66,13 +67,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const sensorRes = await fetch('http://localhost:3000/sensor?pageSize=1&page=1&sortBy=timestamp&sortOrder=DESC');
         const sensorData = await sensorRes.json();
         if (sensorData.sensors && sensorData.sensors.length > 0) {
-          const normalizedData = sensorData.sensors.map((sensor: any) => ({
-            id: sensor.id,
-            temp: sensor.temp || sensor.temperature,
-            hum: sensor.hum || sensor.humidity,
-            light: sensor.light,
-            timestamp: sensor.time || sensor.timestamp,
-          }));
+        const normalizedData = sensorData.sensors.map((sensor: any) => ({
+          id: sensor.id,
+          temp: sensor.temp || sensor.temperature,
+          hum: sensor.hum || sensor.humidity,
+          light: sensor.light,
+          timestamp: formatTimestamp(sensor.time || sensor.timestamp),
+        }));
           setSensorData(normalizedData);
         }
       } catch (err) {

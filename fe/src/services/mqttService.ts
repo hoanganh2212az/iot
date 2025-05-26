@@ -9,7 +9,10 @@ class MQTTService {
       return;
     }
 
-    this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+    this.client = mqtt.connect("ws://192.168.1.21:9001", {
+      username: "hoanganh",
+      password: "22122002"
+    });
 
     this.client.on("connect", () => {
       if (!this.connected) {
@@ -26,7 +29,7 @@ class MQTTService {
       if (topic === "esp32/sensors") {
         try {
           const parsed = JSON.parse(message.toString());
-          callback(parsed); // ✅ Just pass the entry
+          callback(parsed);
         } catch (err) {
           console.error("❌ Sensor parse failed:", err);
         }
@@ -45,14 +48,13 @@ class MQTTService {
             status: parsed.state === "on",
             timestamp: parsed.timestamp,
           };
-          callback(formatted); // ✅ just send the single item
+          callback(formatted);
         } catch (err) {
           console.error("❌ Device parse failed:", err);
         }
       }
     });
   }
-
 
   publishDeviceControl(device: string, status: boolean) {
     if (!this.client) return;
@@ -72,5 +74,4 @@ class MQTTService {
   }
 }
 
-// ✅ Export a singleton instance
 export default new MQTTService();
