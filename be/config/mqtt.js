@@ -3,7 +3,10 @@ const { database } = require('./database');
 
 class MQTTService {
   constructor() {
-    this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+    this.client = mqtt.connect("mqtt://192.168.1.21:1884", {
+      username: "hoanganh",
+      password: "221202"
+    });
     this.listenersInitialized = false;
     this.setupListeners();
   }
