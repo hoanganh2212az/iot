@@ -9,10 +9,12 @@ class MQTTService {
       return;
     }
 
-    this.client = mqtt.connect("ws://192.168.1.21:9001", {
-      username: "hoanganh",
-      password: "22122002"
-    });
+    this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+    
+    // this.client = mqtt.connect("ws://192.168.1.21:9001", {
+    //   username: "hoanganh",
+    //   password: "22122002"
+    // });
 
     this.client.on("connect", () => {
       if (!this.connected) {
@@ -54,16 +56,6 @@ class MQTTService {
         }
       }
     });
-  }
-
-  publishDeviceControl(device: string, status: boolean) {
-    if (!this.client) return;
-
-    const led = device === "light" ? 1 : device === "fan" ? 2 : 3;
-    const payload = JSON.stringify({ led, state: status ? "on" : "off" });
-
-    this.client.publish("esp32/lights/control", payload);
-    console.log(`📤 MQTT published: ${payload}`);
   }
 
   disconnect() {

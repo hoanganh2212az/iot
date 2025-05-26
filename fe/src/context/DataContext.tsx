@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import mqttService from '../services/mqttService';
-import { DeviceType } from '../types';
 import { formatTimestamp } from '../utils/formatDate';
 
 export interface SensorData {
@@ -99,7 +98,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (device in devices) {
       const newStatus = !devices[device as keyof typeof devices];
       setDevices((prev) => ({ ...prev, [device]: newStatus }));
-      mqttService.publishDeviceControl(device, newStatus);
 
       try {
         await fetch('http://localhost:3000/device/toggle', {
