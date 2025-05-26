@@ -29,7 +29,7 @@ const HomePage: React.FC = () => {
       
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         <div className="lg:col-span-3">
-          <SensorChart data={sensorData} limit={20} />
+          <SensorChart data={sensorData} limit={10} />
         </div>
         
         <div className="space-y-4">

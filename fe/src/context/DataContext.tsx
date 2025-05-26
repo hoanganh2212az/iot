@@ -51,21 +51,37 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    fetch('http://localhost:3000/device/status')
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchInitialData = async () => {
+      try {
+        // Fetch device status
+        const deviceRes = await fetch('http://localhost:3000/device/status');
+        const deviceData = await deviceRes.json();
         setDevices({
-          light: data.light,
-          fan: data.fan,
-          aircon: data.airConditioner,
+          light: deviceData.light,
+          fan: deviceData.fan,
+          aircon: deviceData.airConditioner,
         });
-      })
-      .catch((err) => {
-        console.error("❌ Failed to fetch device status:", err);
-      });
-  }, []);
 
-  useEffect(() => {
+        // Fetch latest sensor data
+        const sensorRes = await fetch('http://localhost:3000/sensor?pageSize=1&page=1&sortBy=timestamp&sortOrder=DESC');
+        const sensorData = await sensorRes.json();
+        if (sensorData.sensors && sensorData.sensors.length > 0) {
+          const normalizedData = sensorData.sensors.map((sensor: any) => ({
+            id: sensor.id,
+            temp: sensor.temp || sensor.temperature,
+            hum: sensor.hum || sensor.humidity,
+            light: sensor.light,
+            timestamp: sensor.time || sensor.timestamp,
+          }));
+          setSensorData(normalizedData);
+        }
+      } catch (err) {
+        console.error("❌ Failed to fetch initial data:", err);
+      }
+    };
+
+    fetchInitialData();
+
     mqttService.connect();
     mqttService.subscribeToSensorData((entry) => {
       setSensorData((prev) => [entry, ...prev]);
