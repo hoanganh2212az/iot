@@ -38,17 +38,17 @@ const deviceController = {
   toggle: async (req, res) => {
     const light = req.body.light;
     const fan = req.body.fan;
-    const aircon = req.body.aircon; // ✅ FIXED: match frontend key
+    const aircon = req.body.aircon; 
 
     const devices = [];
 
     if (light !== undefined) devices.push({ device: 'light', state: light });
     if (fan !== undefined) devices.push({ device: 'fan', state: fan });
-    if (aircon !== undefined) devices.push({ device: 'aircon', state: aircon }); // ✅ FIXED
+    if (aircon !== undefined) devices.push({ device: 'aircon', state: aircon }); 
 
     console.log("📥 Toggle request received:", devices);
 
-    const errorCode = await deviceService.toggle(devices);
+    const errorCode = await deviceService.toggle(devices); //nhận req từ FE --> chuyển sang service
 
     if (!errorCode) {
       return res.status(200).json({

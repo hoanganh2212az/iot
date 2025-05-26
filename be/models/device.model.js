@@ -44,7 +44,7 @@ const deviceModel = {
     );
     const aircon = await database.execute(
       'SELECT TOP 1 state FROM devices WHERE device_name = ? ORDER BY id DESC',
-      ['aircon'] // ✅ FIXED: use "aircon" consistently
+      ['aircon'] 
     );
 
     return [

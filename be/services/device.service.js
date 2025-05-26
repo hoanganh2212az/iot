@@ -67,7 +67,7 @@ const deviceService = {
         const stateStr = state ? 'on' : 'off';
 
         if (mqttHandler?.publishDeviceControl) {
-          mqttHandler.publishDeviceControl(name, state);
+          mqttHandler.publishDeviceControl(name, state); //pub lệnh bật đèn
         } else {
           throw new Error("❌ mqttHandler.publishDeviceControl is undefined");
         }
