@@ -7,12 +7,15 @@
 
 const char* ssid = "Tom Toc Xu";
 const char* password = "20022007";
-const char* mqtt_server = "broker.hivemq.com";
-const int mqtt_port = 1883;
+// const char* mqtt_server = "broker.hivemq.com";
+// const int mqtt_port = 1883;
+const char* mqtt_server = "192.168.2.24"; // Your computer's IP address
+const int mqtt_port = 1884;
+const char* mqtt_username = "hoanganh";
+const char* mqtt_password = "221202";
 
 // NTP Time
 const char* ntpServer = "pool.ntp.org";
-const char* ntpFallback = "129.6.15.28";
 const long gmtOffset_sec = 7 * 3600;
 const int daylightOffset_sec = 0;
 
@@ -33,7 +36,7 @@ bool ledStates[4] = {false, false, false, false};  // 1-based indexing
 #define ALERT_LIGHT 27
 
 unsigned long lastBlinkTime = 0;
-const unsigned long blinkInterval = 500;
+const unsigned long blinkInterval = 100;
 bool alertStates[3] = {false, false, false};
 bool blinkStates[3] = {false, false, false};
 
@@ -62,7 +65,7 @@ void setup_wifi() {
 
   int retries = 0;
   while (WiFi.status() != WL_CONNECTED && retries++ < 20) {
-    delay(500);
+    delay(300);
     Serial.print(".");
   }
 
@@ -73,30 +76,21 @@ void setup_wifi() {
   }
 }
 
-void sync_time() {
-  struct tm timeinfo;
+void sync_time_fast() {
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  int retry = 0;
+  Serial.print("Syncing time");
 
-  while (!getLocalTime(&timeinfo) && retry++ < 15) {
+  struct tm timeinfo;
+  int attempt = 0;
+  while (!getLocalTime(&timeinfo) && attempt++ < 20) {
     Serial.print(".");
     delay(200);
-  }
-
-  if (!getLocalTime(&timeinfo)) {
-    Serial.println("\nTrying fallback NTP...");
-    configTime(gmtOffset_sec, daylightOffset_sec, ntpFallback);
-    retry = 0;
-    while (!getLocalTime(&timeinfo) && retry++ < 10) {
-      Serial.print(".");
-      delay(200);
-    }
   }
 
   if (getLocalTime(&timeinfo)) {
     Serial.println("\nTime synced: " + getFormattedTime());
   } else {
-    Serial.println("\nNTP sync failed.");
+    Serial.println("\nTime sync failed.");
   }
 }
 
@@ -183,7 +177,7 @@ void setup() {
   digitalWrite(ALERT_LIGHT, LOW);
 
   setup_wifi();
-  sync_time();
+  sync_time_fast();
 
   dht.begin();
   client.setServer(mqtt_server, mqtt_port);
@@ -222,8 +216,8 @@ void loop() {
       client.publish("esp32/sensors", payload.c_str());
       Serial.println("Published sensor data: " + payload);
 
-      alertStates[0] = temp > 40;
-      alertStates[1] = hum > 75;
+      alertStates[0] = temp > 30;
+      alertStates[1] = hum > 70;
       alertStates[2] = light > 800;
     } else {
       Serial.println("DHT sensor read failed.");
