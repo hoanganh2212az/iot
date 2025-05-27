@@ -48,7 +48,7 @@ const deviceController = {
 
     console.log("📥 Toggle request received:", devices);
 
-    const errorCode = await deviceService.toggle(devices); //nhận req từ FE --> chuyển sang service
+    const errorCode = await deviceService.toggle(devices);
 
     if (!errorCode) {
       return res.status(200).json({
