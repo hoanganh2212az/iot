@@ -96,8 +96,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const toggleDevice = async (device: string) => {
     if (device in devices) {
-      const newStatus = !devices[device as keyof typeof devices];
-      setDevices((prev) => ({ ...prev, [device]: newStatus }));
+      const newStatus = !devices[device as keyof typeof devices]; 
+      setDevices((prev) => ({ ...prev, [device]: newStatus })); 
 
       try {
         await fetch('http://localhost:3000/device/toggle', {

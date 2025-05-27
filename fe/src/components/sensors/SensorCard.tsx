@@ -11,9 +11,9 @@ const SensorCard: React.FC<SensorCardProps> = ({ type, value, unit }) => {
   const getWarningStatus = () => {
     switch (type) {
       case 'temperature':
-        return value > 40;
+        return value > 30;
       case 'humidity':
-        return value > 75;
+        return value > 70;
       case 'light':
         return value > 800;
       default:
