@@ -181,7 +181,7 @@ const SensorDataPage: React.FC = () => {
             <input
               id="timestamp"
               type="text"
-              placeholder="HH:mm:ss DD-MM-YYYY"
+              placeholder="HH:mm:ss DD/MM/YYYY"
               className="w-full p-2 border border-gray-300 rounded-md"
               value={searchTimestamp}
               onChange={e => setSearchTimestamp(e.target.value)}

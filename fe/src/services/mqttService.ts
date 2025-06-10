@@ -9,12 +9,12 @@ class MQTTService {
       return;
     }
 
-    // this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
+    this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
     
-    this.client = mqtt.connect("ws://localhost:9001", {
-      username: "hoanganh",
-      password: "221202"
-    });
+    // this.client = mqtt.connect("ws://localhost:9001", {
+    //   username: "hoanganh",
+    //   password: "221202"
+    // });
 
     this.client.on("connect", () => {
       if (!this.connected) {
