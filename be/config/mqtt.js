@@ -1,14 +1,12 @@
 const mqtt = require('mqtt');
 const { database } = require('./database');
+const dayjs = require('dayjs');
+const customParseFormat = require('dayjs/plugin/customParseFormat');
+dayjs.extend(customParseFormat);
 
 class MQTTService {
   constructor() {
-    // this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
-
-    this.client = mqtt.connect("mqtt://localhost:1884", {
-      username: "hoanganh",
-      password: "221202"
-    });
+    this.client = mqtt.connect("wss://broker.hivemq.com:8884/mqtt");
 
     this.listenersInitialized = false;
     this.setupListeners();
@@ -61,18 +59,15 @@ class MQTTService {
   }
 
   getSQLTimestamp(raw) {
-    if (raw && !isNaN(Date.parse(raw))) {
-      const d = new Date(raw);
-      return this.formatTimestamp(d);
+    const parsed = dayjs(raw, 'HH:mm:ss DD/MM/YYYY', true);
+    if (parsed.isValid()) {
+      const formatted = parsed.format('YYYY-MM-DD HH:mm:ss');
+      return formatted;
     }
 
-    const now = new Date();
-    return this.formatTimestamp(now);
-  }
-
-  formatTimestamp(date) {
-    const pad = (n) => String(n).padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+    const fallback = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    console.warn("[⚠️ Timestamp fallback used]", raw, "=>", fallback);
+    return fallback;
   }
 
   getDeviceName(ledNumber) {

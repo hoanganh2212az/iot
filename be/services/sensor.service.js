@@ -23,7 +23,7 @@ const sensorService = {
       params.push(filters.light);
     }
     if (filters.time) {
-      const parsedDate = dayjs(filters.time, 'HH:mm:ss DD/MM/YYYY');
+      const parsedDate = dayjs(filters.time, ['HH:mm:ss DD/MM/YYYY', 'HH:mm:ss DD-MM-YYYY', 'H:m:s D/M/YYYY']);
       if (parsedDate.isValid()) {
         const formatted = parsedDate.format('YYYY-MM-DD HH:mm:ss');
         conditions.push('timestamp = ?');
