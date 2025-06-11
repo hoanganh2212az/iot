@@ -136,8 +136,9 @@ void callback(char* topic, byte* message, unsigned int length) {
   for (int i = 0; i < length; i++) msg += (char)message[i];
   Serial.println("MQTT Received: " + msg);
 
-  //Tách thông tin LED số mấy và trạng thái là gì
+  //Tách thông tin LED số mấy 
   int ledNum = msg.indexOf("\"led\":") != -1 ? msg.substring(msg.indexOf("\"led\":") + 6).toInt() : 0;
+  // 🔍 Kiểm tra xem message yêu cầu "on" hay "off"
   String state = msg.indexOf("on") != -1 ? "on" : "off";
   bool turnOn = (state == "on");
 
