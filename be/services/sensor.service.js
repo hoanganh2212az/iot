@@ -33,6 +33,7 @@ const sensorService = {
       }
     }
 
+    //GHÉP ĐIỀU KIỆN: e.g temp x và light y
     if (conditions.length > 0) {
       query += ' WHERE ' + conditions.join(' AND ');
     }
@@ -48,6 +49,7 @@ const sensorService = {
     params.push((page - 1) * pageSize);
     params.push(pageSize);
 
+    // TRUY VẤN CHÍNH!!
     const sensors = await database.execute(query, params);
     const countResult = await database.execute(
       `SELECT COUNT(*) as total FROM sensors${conditions.length > 0 ? ' WHERE ' + conditions.join(' AND ') : ''}`,
