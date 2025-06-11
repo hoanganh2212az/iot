@@ -136,20 +136,25 @@ void callback(char* topic, byte* message, unsigned int length) {
   for (int i = 0; i < length; i++) msg += (char)message[i];
   Serial.println("MQTT Received: " + msg);
 
+  //Tách thông tin LED số mấy 
   int ledNum = msg.indexOf("\"led\":") != -1 ? msg.substring(msg.indexOf("\"led\":") + 6).toInt() : 0;
+  // 🔍 Kiểm tra xem message yêu cầu "on" hay "off"
   String state = msg.indexOf("on") != -1 ? "on" : "off";
   bool turnOn = (state == "on");
 
+  //Nếu đúng LED hợp lệ
   if (ledNum >= 1 && ledNum <= 3) {
     if (ledStates[ledNum] == turnOn) {
-      Serial.println("🔁 Ignored redundant toggle for LED " + String(ledNum));
-      return;
+      Serial.println("🔁 Ignored redundant toggle for LED " + String(ledNum)); //Nếu trạng thái không đổi thì bỏ qua
+      return; 
     }
 
+    // Bật tắt chân GPIO (đèn) tương ứng
     int pin = (ledNum == 1) ? LED1 : (ledNum == 2) ? LED2 : LED3;
     digitalWrite(pin, turnOn ? HIGH : LOW);
     ledStates[ledNum] = turnOn;
 
+    //Gửi một cái log xác nhận ngược lại
     String logPayload = "{\"led\":" + String(ledNum) +
                         ",\"state\":\"" + state +
                         "\",\"timestamp\":\"" + getFormattedTime() + "\"}";
@@ -196,26 +201,32 @@ void loop() {
 
   client.loop();
 
+  // 📤 Đọc sensor và gửi MQTT mỗi 2 giây
   unsigned long now = millis();
   if (now - lastSensorPublish > sensorInterval) {
-    lastSensorPublish = now;
+    lastSensorPublish = now; // Cập nhật mốc thời gian gửi gần nhất
 
+    // 🌡️ Đọc nhiệt độ và độ ẩm từ cảm biến DHT11
     float temp = dht.readTemperature();
     float hum = dht.readHumidity();
+    // 💡 Đọc ánh sáng từ cảm biến quang trở (qua ADC pin 32)
     int rawLight = analogRead(LIGHT_ANALOG);
     int light = map(rawLight, 4095, 0, 0, 1000);
-    light = constrain(light, 0, 1000);
+    light = constrain(light, 0, 1000); //giới hạn lux từ 0-1000
 
-    String timestamp = getFormattedTime();
+    String timestamp = getFormattedTime(); //Thời gian đúng định dạng
 
     if (!isnan(temp) && !isnan(hum)) {
+      // 📦 Đóng gói payload JSON
       String payload = "{\"temp\":" + String(temp, 1) +
                        ",\"hum\":" + String(hum, 1) +
                        ",\"light\":" + String(light) +
                        ",\"timestamp\":\"" + timestamp + "\"}";
+      // 🚀 Gửi payload lên topic MQTT
       client.publish("esp32/sensors", payload.c_str());
       Serial.println("Published sensor data: " + payload);
 
+      // Cập nhật trạng thái cảnh báo (dùng cho đèn nhấp nháy)
       alertStates[0] = temp > 30;
       alertStates[1] = hum > 70;
       alertStates[2] = light > 800;
@@ -224,6 +235,7 @@ void loop() {
     }
   }
 
+  // 💡 Nhấp nháy đèn cảnh báo nếu có cảnh báo (mỗi 100ms)
   if (now - lastBlinkTime >= blinkInterval) {
     lastBlinkTime = now;
     for (int i = 0; i < 3; i++) {
